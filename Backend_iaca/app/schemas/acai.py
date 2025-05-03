@@ -1,14 +1,16 @@
 from pydantic import BaseModel
-from datetime import datetime
+from typing import Optional
 
 class AcaiLoteCreate(BaseModel):
-    quantidade: float
-    preco_por_litro: float
-    descricao: str | None = None
+    quantidade_kg: float
+    preco_kg: float
 
-class AcaiLoteOut(AcaiLoteCreate):
+class AcaiLoteOut(BaseModel):
     id: int
-    disponivel: bool
-    created_at: datetime
+    vendedor_id: int
+    quantidade_kg: float
+    preco_kg: float
+    disponivel: int
+
     class Config:
         from_attributes = True
