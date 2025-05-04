@@ -12,5 +12,6 @@ class AcaiLote(Base):
     preco_kg = Column(Float, nullable=False)
     disponivel = Column(Integer, default=1)  # 1: disponível, 0: vendido
     criado_em = Column(DateTime, default=datetime.utcnow)
+    user = relationship("User", back_populates="lotes")
 
     vendedor = relationship("User", back_populates="lotes")

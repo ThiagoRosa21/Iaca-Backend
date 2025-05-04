@@ -10,3 +10,4 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
     acai_lotes = relationship("AcaiLote", back_populates="vendedor")
+    lotes = relationship("AcaiLote", back_populates="user")
