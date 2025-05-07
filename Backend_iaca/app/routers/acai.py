@@ -33,3 +33,14 @@ def comprar_lote(lote_id: int, db: Session = Depends(get_db)):
     if not lote:
         raise HTTPException(status_code=404, detail="Lote não disponível")
     return lote
+
+from app.schemas.acai import AcaiCarocoCreate
+from app.crud import acai as crud_acai
+
+@router.post("/carocos")
+def criar_caroco(
+    caroco_data: AcaiCarocoCreate,
+    db: Session = Depends(get_db),
+    usuario: User = Depends(get_current_user)
+):
+    return crud_acai.criar_caroco(db, caroco_data, usuario.id)
