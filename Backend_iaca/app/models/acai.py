@@ -10,8 +10,6 @@ class AcaiLote(Base):
     vendedor_id = Column(Integer, ForeignKey("users.id"))
     quantidade_kg = Column(Float, nullable=False)
     preco_kg = Column(Float, nullable=False)
-    disponivel = Column(Integer, default=1)  # 1: disponível, 0: vendido
+    disponivel = Column(Integer, default=1)
     criado_em = Column(DateTime, default=datetime.utcnow)
-    user = relationship("User", back_populates="lotes")
-
     vendedor = relationship("User", back_populates="lotes")

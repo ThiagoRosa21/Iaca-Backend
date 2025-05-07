@@ -1,25 +1,47 @@
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.models.acai import AcaiLote
-from app.schemas.acai import AcaiLoteCreate
 
-def criar_lote(db: Session, lote: AcaiLoteCreate, vendedor_id: int):
-    db_lote = AcaiLote(
-        vendedor_id=vendedor_id,
-        quantidade_kg=lote.quantidade_kg,
-        preco_kg=lote.preco_kg
-    )
-    db.add(db_lote)
-    db.commit()
-    db.refresh(db_lote)
-    return db_lote
+from app.schemas.acai import (
+    AcaiLoteCreate, AcaiLoteOut,
+    AcaiCarocoCreate, AcaiCarocoOut
+)
+from app.crud import acai as crud_acai
+from app.database import SessionLocal
+from app.auth.jwt import get_current_user
+from app.models.user import User
 
-def listar_lotes_disponiveis(db: Session):
-    return db.query(AcaiLote).filter(AcaiLote.disponivel == 1).all()
+router = APIRouter(prefix="/acai", tags=["açai"])
 
-def comprar_lote(db: Session, lote_id: int):
-    lote = db.query(AcaiLote).filter(AcaiLote.id == lote_id, AcaiLote.disponivel == 1).first()
-    if lote:
-        lote.disponivel = 0
-        db.commit()
-        db.refresh(lote)
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+@router.post("/lotes", response_model=AcaiLoteOut)
+def registrar_lote(
+    lote: AcaiLoteCreate,
+    db: Session = Depends(get_db),
+    usuario: User = Depends(get_current_user)
+):
+    return crud_acai.criar_lote(db, lote, usuario.id)
+
+@router.get("/lotes", response_model=list[AcaiLoteOut])
+def listar_lotes(db: Session = Depends(get_db)):
+    return crud_acai.listar_lotes_disponiveis(db)
+
+@router.post("/comprar/{lote_id}", response_model=AcaiLoteOut)
+def comprar_lote(lote_id: int, db: Session = Depends(get_db)):
+    lote = crud_acai.comprar_lote(db, lote_id)
+    if not lote:
+        raise HTTPException(status_code=404, detail="Lote não disponível")
     return lote
+
+@router.post("/carocos", response_model=AcaiCarocoOut)
+def criar_caroco(
+    caroco_data: AcaiCarocoCreate,
+    db: Session = Depends(get_db),
+    usuario: User = Depends(get_current_user)
+):
+    return crud_acai.criar_caroco(db, caroco_data, usuario.id)
