@@ -74,3 +74,17 @@ class Pagamento(Base):
     empresa = relationship("Empresa", back_populates="pagamentos")
     nota_fiscal_hash = Column(String, nullable=True)
 
+class Rota(Base):
+    __tablename__ = "rotas"
+
+    id = Column(Integer, primary_key=True, index=True)
+    empresa_id = Column(Integer, ForeignKey("empresas.id"), nullable=False)
+    origem_lat = Column(Float, nullable=False)
+    origem_lng = Column(Float, nullable=False)
+    destino_lat = Column(Float, nullable=False)
+    destino_lng = Column(Float, nullable=False)
+    distancia_km = Column(Float, nullable=False)
+    duracao_min = Column(Float, nullable=False)
+    data_registro = Column(DateTime, default=datetime.utcnow)
+
+    empresa = relationship("Empresa", back_populates="rotas")
