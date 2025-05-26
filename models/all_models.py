@@ -15,7 +15,7 @@ class Empresa(Base):
     whatsapp = Column(Boolean, default=False)
     endereco = Column(String)
     receber_info = Column(Boolean, default=False)
-
+    rotas = relationship("Rota", back_populates="empresa")
     pontos_coleta = relationship("PontoColeta", back_populates="empresa")
     pagamentos = relationship("Pagamento", back_populates="empresa")
 
