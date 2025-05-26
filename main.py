@@ -4,12 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from routers import auth, empresa, vendedor, descarte
 from database import create_db
 from routers import pagamento
-
+from routers import mapbox
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -22,6 +22,7 @@ app.include_router(empresa.router, prefix="/api/empresa", tags=["Empresa"])
 app.include_router(vendedor.router, prefix="/api/vendedor", tags=["Vendedor"])
 app.include_router(descarte.router, prefix="/api/descarte", tags=["Descarte"])
 app.include_router(pagamento.router, prefix="/api/pagamento", tags=["Pagamento"])
+app.include_router(mapbox.router, prefix="/api", tags=["rota"])
 
 @app.get("/")
 def root():

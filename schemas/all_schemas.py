@@ -2,7 +2,7 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import datetime
-
+from typing import Dict, Any
 
 class Token(BaseModel):
     access_token: str
@@ -97,3 +97,16 @@ class PagamentoResponse(BaseModel):
     nota_fiscal_hash: Optional[str] = None
     class Config:
         from_attributes = True 
+
+class Coordenada(BaseModel):
+    lat: float
+    lng: float
+
+class RotaRequest(BaseModel):
+    origem: Coordenada
+    destino: Coordenada
+
+class RotaResponse(BaseModel):
+    distancia_km: float
+    duracao_min: float
+    caminho_geojson: Dict[str, Any]
