@@ -58,7 +58,7 @@ class PontoBase(BaseModel):
     status: Optional[str] = "ativo"
 
 class PontoCreate(PontoBase):
-    empresa_id: int
+    pass
 
 class PontoResponse(PontoBase):
     id: int
@@ -86,6 +86,7 @@ class DescarteResponse(BaseModel):
 class PagamentoCreate(BaseModel):
     empresa_id: int
     valor_centavos: int
+    ponto_id: Optional[int] = None
 
 class PagamentoResponse(BaseModel):
     id: int
@@ -110,3 +111,5 @@ class RotaResponse(BaseModel):
     distancia_km: float
     duracao_min: float
     caminho_geojson: Dict[str, Any]
+    
+    

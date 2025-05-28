@@ -16,7 +16,6 @@ class Empresa(Base):
     endereco = Column(String)
     receber_info = Column(Boolean, default=False)
     rotas = relationship("Rota", back_populates="empresa")
-    pontos_coleta = relationship("PontoColeta", back_populates="empresa")
     pagamentos = relationship("Pagamento", back_populates="empresa")
 
 
@@ -43,10 +42,9 @@ class PontoColeta(Base):
     lat = Column(Float)
     lng = Column(Float)
     status = Column(String, default="ativo")
-    empresa_id = Column(Integer, ForeignKey("empresas.id"))
-
-    empresa = relationship("Empresa", back_populates="pontos_coleta")
     descartes = relationship("Descarte", back_populates="ponto")
+    historico_valores = relationship("HistoricoValorKG", back_populates="ponto")
+    
 
 
 class Descarte(Base):
@@ -57,7 +55,7 @@ class Descarte(Base):
     quantidade_kg = Column(Float)
     data_hora = Column(DateTime, default=datetime.utcnow)
     foto_url = Column(String, nullable=True)
-
+    comprado = Column(Boolean, default=False) 
     vendedor = relationship("Vendedor", back_populates="descartes")
     ponto = relationship("PontoColeta", back_populates="descartes")
 
@@ -73,7 +71,8 @@ class Pagamento(Base):
     metodo_pagamento = Column(String, default="card")
     empresa = relationship("Empresa", back_populates="pagamentos")
     nota_fiscal_hash = Column(String, nullable=True)
-
+    ponto_id = Column(Integer, ForeignKey("pontos_coleta.id"), nullable=True)
+    
 class Rota(Base):
     __tablename__ = "rotas"
 
@@ -88,3 +87,17 @@ class Rota(Base):
     data_registro = Column(DateTime, default=datetime.utcnow)
 
     empresa = relationship("Empresa", back_populates="rotas")
+    
+    
+class HistoricoValorKG(Base):
+    __tablename__ = "historico_valor_kg"
+    id = Column(Integer, primary_key=True, index=True)
+    ponto_id = Column(Integer, ForeignKey("pontos_coleta.id"), nullable=False)
+    valor_por_kg = Column(Float, nullable=False)
+    data_inicio = Column(DateTime, default=datetime.utcnow)
+    data_fim = Column(DateTime, nullable=True)
+
+    ponto = relationship("PontoColeta", back_populates="historico_valores")
+
+
+

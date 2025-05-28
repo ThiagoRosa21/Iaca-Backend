@@ -15,6 +15,7 @@ from fpdf import FPDF
 import qrcode
 import hashlib
 
+
 load_dotenv()
 router = APIRouter()
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
@@ -47,8 +48,8 @@ def pagar_empresa(dados: PagamentoCreate, db: Session = Depends(get_db)):
                 "quantity": 1,
             }],
             mode="payment",
-            success_url="https://stripe.com/success",
-            cancel_url="https://stripe.com/cancel",
+            success_url="http://localhost:5173/sucesso",
+            cancel_url="http://localhost:5173/erro",
         )
 
         pagamento = Pagamento(
@@ -57,7 +58,8 @@ def pagar_empresa(dados: PagamentoCreate, db: Session = Depends(get_db)):
             stripe_session_id=session.id,
             status="pendente",
             metodo_pagamento="card",
-            data_pagamento=datetime.utcnow()
+            data_pagamento=datetime.utcnow(),
+            ponto_id=dados.ponto_id
         )
 
         db.add(pagamento)
@@ -72,6 +74,8 @@ def pagar_empresa(dados: PagamentoCreate, db: Session = Depends(get_db)):
 
 @router.post("/webhook", summary="Recebe eventos de pagamento do Stripe")
 async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
+    from models.all_models import Descarte  # Importar se necessário
+
     payload = await request.body()
     sig_header = request.headers.get("stripe-signature")
 
@@ -95,6 +99,19 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
             pagamento.status = "pago"
             db.commit()
 
+            # ✅ Zera os descartes do ponto que foram comprados
+            if pagamento.ponto_id:
+                descartes = db.query(Descarte).filter(
+                    Descarte.ponto_id == pagamento.ponto_id,
+                    Descarte.comprado == False
+                ).all()
+
+                for d in descartes:
+                    d.comprado = True
+
+                db.commit()
+
+            # Envia comprovante por e-mail
             empresa = db.query(Empresa).filter(Empresa.id == pagamento.empresa_id).first()
             if empresa:
                 caminho_pdf = gerar_comprovante_pdf(
@@ -111,6 +128,8 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
                 )
 
     return {"status": "success"}
+
+
 
 
 @router.get("/empresa/{empresa_id}", response_model=List[PagamentoResponse])
@@ -144,7 +163,7 @@ def historico_pagamentos(empresa_id: int, db: Session = Depends(get_db)):
     return resultado
 
 
-@router.post("/nota-fiscal/{pagamento_id}", summary="Gerar nota fiscal estilo DANFE")
+@router.get("/nota-fiscal/{pagamento_id}", summary="Gerar nota fiscal estilo DANFE")
 def gerar_nota_fiscal(pagamento_id: int, db: Session = Depends(get_db)):
     pagamento = db.query(Pagamento).filter(Pagamento.id == pagamento_id).first()
     if not pagamento or pagamento.status != "pago":
@@ -215,3 +234,5 @@ def gerar_nota_fiscal(pagamento_id: int, db: Session = Depends(get_db)):
     )
 
     return FileResponse(caminho, media_type='application/pdf', filename=f"nota_{pagamento_id}.pdf")
+
+
