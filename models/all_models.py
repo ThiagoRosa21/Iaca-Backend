@@ -17,8 +17,10 @@ class Empresa(Base):
     receber_info = Column(Boolean, default=False)
     rotas = relationship("Rota", back_populates="empresa")
     pagamentos = relationship("Pagamento", back_populates="empresa")
-
-
+    email_verificado = Column(Boolean, default=False)
+    codigo_verificacao = Column(String, nullable=True)
+    codigo_verificacao_expira_em = Column(DateTime, nullable=True)
+    
 class Vendedor(Base):
     __tablename__ = "vendedores"
     id = Column(Integer, primary_key=True, index=True)
@@ -30,9 +32,10 @@ class Vendedor(Base):
     whatsapp = Column(Boolean, default=False)
     receber_info = Column(Boolean, default=False)
     pontos = Column(Integer, default=0)
-
+    email_verificado = Column(Boolean, default=False)
+    codigo_verificacao = Column(String, nullable=True)
     descartes = relationship("Descarte", back_populates="vendedor")
-
+    codigo_verificacao_expira_em = Column(DateTime, nullable=True)
 
 class PontoColeta(Base):
     __tablename__ = "pontos_coleta"
