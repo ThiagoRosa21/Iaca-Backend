@@ -9,3 +9,4 @@ python-dotenv
 fpdf
 qrcode[pil]
 pydantic[email]
+python-multipart
