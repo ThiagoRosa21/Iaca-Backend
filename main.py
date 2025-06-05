@@ -9,12 +9,16 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173",
-    "https://iaca.vercel.app"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://iaca.vercel.app",
+        "https://iaca-81sd3a2cs-thiago-rosas-projects-44c4046d.vercel.app", 
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 create_db()
 
