@@ -9,14 +9,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "https://iaca.vercel.app",
-        "https://iaca.com.br",
-        "https://www.iaca.com.br",
-        "https://iaca-81sd3a2cs-thiago-rosas-projects-44c4046d.vercel.app",
-        "https://iaca-jq6n3xfz4-thiago-rosas-projects-44c4046d.vercel.app", 
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
