@@ -48,7 +48,7 @@ def pagar_empresa(dados: PagamentoCreate, db: Session = Depends(get_db)):
                 "quantity": 1,
             }],
             mode="payment",
-            success_url="http://localhost:5173/sucesso",
+            success_url="https://iaca.vercel.app/sucesso",
             cancel_url="http://localhost:5173/erro",
         )
 
